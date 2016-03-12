@@ -1,4 +1,4 @@
-setwd("~/git/cleanning_data")
+#setwd("~/git/datacleanning")
 # 0. Loading the data
 folder_test <- "./UCI HAR Dataset/test/"
 folder_trn <- "./UCI HAR Dataset/train/"
@@ -33,7 +33,19 @@ levels(ds$activity) <- c("walking", "upstairs", "downstairs",
                          "sitting", "standing", "laying")
 
 # 4. Appropriately labels the data set with descriptive variable names.
-names(ds)[1:66] <- feat[id_sel]
+feat <- feat[id_sel]
+feat <- sub("\\(\\)", "", feat)
+feat <- tolower(feat)
+feat <- sub("^t", "time", feat)
+feat <- sub("^f", "frequency", feat)
+feat <- sub("acc", "acceleration", feat)
+feat <- sub("gyro", "angularvelocity", feat)
+feat <- sub("mag", "magnitude", feat)
+feat <- sub("jerk", "jerksignal", feat)
+feat <- sub("mean-", "mean", feat)
+feat <- sub("std-", "std", feat)
+
+names(ds)[1:66] <- feat
 
 # 5. From the data set in step 4, creates a second, independent tidy data set 
 # with the average of each variable for each activity and each subject.
@@ -41,4 +53,4 @@ library(dplyr)
 ds$subject <- as.factor(ds$subject)
 gr <- group_by(ds, activity, subject)
 avg_ds <- summarise_each(gr, funs(mean))
-
+write.table(avg_ds, file = "average_tidy_dataset.txt", row.names = F)
